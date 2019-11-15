@@ -27,7 +27,6 @@ async def apply_settings(ctx, msg):
         await require_confirm_change_label(ctx, msg.label)
 
     if msg.use_passphrase is not None:
-        storage.cache.clear()
         await require_confirm_change_passphrase(ctx, msg.use_passphrase)
 
     if msg.passphrase_source is not None:

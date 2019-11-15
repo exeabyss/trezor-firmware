@@ -95,15 +95,25 @@ def test_state_enable_passphrase(client):
         == "xpub6BiVtCpG9fQPxnPmHXG8PhtzQdWC2Su4qWu6XW9tpWFYhxydCLJGrWBJZ5H6qTAHdPQ7pQhtpjiYZVZARo14qHiay2fvrX996oEP42u8wZy"
     )
 
-    # Turn on passphrase. The cache will be cleared.
+    # Turn on passphrase.
     response = client.call_raw(messages.ApplySettings(use_passphrase=True))
     assert isinstance(response, messages.ButtonRequest)  # confirm dialog
     client.debug.press_yes()
     response = client.call_raw(messages.ButtonAck())
     assert isinstance(response, messages.Success)
 
-    # Trezor will prompt for it.
+    # The state is unchanged, therefore we do not prompt for the passphrase.
     response = client.call_raw(messages.Initialize(state=state))
+    xpub = _get_xpub(client, passphrase_prompt=False)
+    assert isinstance(response, messages.Features)
+    assert state == response.state
+    assert (
+        xpub
+        == "xpub6BiVtCpG9fQPxnPmHXG8PhtzQdWC2Su4qWu6XW9tpWFYhxydCLJGrWBJZ5H6qTAHdPQ7pQhtpjiYZVZARo14qHiay2fvrX996oEP42u8wZy"
+    )
+
+    # We clear the state now, so the passphrase should be asked.
+    response = client.call_raw(messages.Initialize())
     xpub = _get_xpub(client, passphrase_prompt=True)
     assert isinstance(response, messages.Features)
     assert state != response.state
