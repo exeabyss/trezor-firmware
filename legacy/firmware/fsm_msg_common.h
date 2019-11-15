@@ -377,6 +377,7 @@ void fsm_msgApplySettings(const ApplySettings *msg) {
   }
   if (msg->has_use_passphrase) {
     config_setPassphraseProtection(msg->use_passphrase);
+    session_clear(false);  // invalidate seed cache
   }
   if (msg->has_homescreen) {
     config_setHomescreen(msg->homescreen.bytes, msg->homescreen.size);
